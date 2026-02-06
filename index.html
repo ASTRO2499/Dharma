@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monkey Control - SAM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 30%, #16213e 60%, #0f1419 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            color: #fff;
+            position: relative;
+        }
+
+        /* Animated background stars */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, white, rgba(255, 255, 255, 0)),
+                radial-gradient(2px 2px at 60% 70%, white, rgba(255, 255, 255, 0)),
+                radial-gradient(1px 1px at 50% 50%, white, rgba(255, 255, 255, 0)),
+                radial-gradient(1px 1px at 80% 10%, white, rgba(255, 255, 255, 0)),
+                radial-gradient(2px 2px at 90% 60%, white, rgba(255, 255, 255, 0)),
+                radial-gradient(1px 1px at 30% 80%, white, rgba(255, 255, 255, 0)),
+                radial-gradient(1px 1px at 10% 40%, white, rgba(255, 255, 255, 0));
+            background-repeat: repeat;
+            background-size: 200% 200%;
+            animation: twinkle 5s ease-in-out infinite;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Virus particles */
+        body::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(3px 3px at 15% 25%, #ff3333, rgba(255, 51, 51, 0)),
+                radial-gradient(2px 2px at 75% 45%, #ff6666, rgba(255, 102, 102, 0)),
+                radial-gradient(2px 2px at 40% 65%, #ff3333, rgba(255, 51, 51, 0)),
+                radial-gradient(3px 3px at 85% 20%, #cc0000, rgba(204, 0, 0, 0)),
+                radial-gradient(2px 2px at 25% 80%, #ff3333, rgba(255, 51, 51, 0)),
+                radial-gradient(2px 2px at 60% 10%, #ff6666, rgba(255, 102, 102, 0)),
+                radial-gradient(3px 3px at 10% 55%, #cc0000, rgba(204, 0, 0, 0));
+            background-repeat: repeat;
+            background-size: 300% 300%;
+            animation: virus-float 8s ease-in-out infinite;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes virus-float {
+            0%, 100% { 
+                background-position: 0% 0%;
+                opacity: 0.3;
+            }
+            50% { 
+                background-position: 100% 100%;
+                opacity: 0.6;
+            }
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .danger-sign {
+            position: absolute;
+            font-size: 80px;
+            animation: danger-pulse 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 51, 51, 0.8));
+            z-index: 10;
+        }
+
+        .danger-top-left {
+            top: 20px;
+            left: 20px;
+        }
+
+        .danger-top-right {
+            top: 20px;
+            right: 20px;
+            transform: scaleX(-1);
+        }
+
+        .danger-bottom-left {
+            bottom: 20px;
+            left: 20px;
+            transform: scaleY(-1);
+        }
+
+        .danger-bottom-right {
+            bottom: 20px;
+            right: 20px;
+            transform: scaleX(-1) scaleY(-1);
+        }
+
+        @keyframes danger-pulse {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.15) rotate(10deg);
+                opacity: 1;
+            }
+        }
+
+        .caption {
+            position: absolute;
+            top: 50px;
+            font-size: 3em;
+            font-weight: bold;
+            text-shadow: 
+                0 0 10px rgba(255, 51, 51, 0.8),
+                0 0 20px rgba(204, 0, 0, 0.8),
+                0 0 30px rgba(255, 0, 0, 0.6),
+                0 0 50px rgba(255, 51, 51, 0.4);
+            letter-spacing: 3px;
+            animation: virus-glow-pulse 2s ease-in-out infinite, float-up 3s ease-in-out infinite;
+            background: linear-gradient(45deg, #ff3333, #ff6666, #ff3333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes virus-glow-pulse {
+            0%, 100% {
+                text-shadow: 
+                    0 0 10px rgba(255, 51, 51, 0.8),
+                    0 0 20px rgba(204, 0, 0, 0.8),
+                    0 0 30px rgba(255, 0, 0, 0.6);
+                transform: scale(1);
+            }
+            50% {
+                text-shadow: 
+                    0 0 20px rgba(255, 102, 102, 1),
+                    0 0 40px rgba(204, 0, 0, 0.8),
+                    0 0 60px rgba(255, 0, 0, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes float-up {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .monkeys-container {
+            position: relative;
+            width: 600px;
+            height: 400px;
+        }
+
+        .monkey {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            filter: drop-shadow(0 0 35px rgba(255, 51, 51, 0.9)) drop-shadow(0 0 20px rgba(204, 0, 0, 0.7));
+            animation: laugh-bounce 0.8s ease-in-out infinite;
+        }
+
+        .monkey:nth-child(1) {
+            animation: orbit-left 8s linear infinite, laugh-bounce 0.8s ease-in-out infinite;
+        }
+
+        .monkey:nth-child(2) {
+            animation: orbit-right 8s linear infinite, laugh-bounce 0.8s ease-in-out infinite 0.4s;
+        }
+
+        .monkey-emoji {
+            animation: smile-laugh 1s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(255, 51, 51, 0.8);
+        }
+
+        @keyframes smile-laugh {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+            }
+            25% {
+                transform: scale(1.2) rotate(-15deg);
+            }
+            50% {
+                transform: scale(1) rotate(0deg);
+            }
+            75% {
+                transform: scale(1.2) rotate(15deg);
+            }
+        }
+
+        @keyframes laugh-bounce {
+            0%, 100% {
+                transform: scale(1) translateY(0);
+            }
+            25% {
+                transform: scale(1.08) translateY(-8px);
+            }
+            50% {
+                transform: scale(0.95) translateY(0);
+            }
+            75% {
+                transform: scale(1.08) translateY(-8px);
+            }
+        }
+
+        @keyframes orbit-left {
+            0% {
+                left: 0;
+                top: 0;
+            }
+            25% {
+                left: 300px;
+                top: 0;
+            }
+            50% {
+                left: 400px;
+                top: 200px;
+            }
+            75% {
+                left: 0;
+                top: 200px;
+            }
+            100% {
+                left: 0;
+                top: 0;
+            }
+        }
+
+        @keyframes orbit-right {
+            0% {
+                right: 0;
+                top: 200px;
+            }
+            25% {
+                right: 0;
+                top: 0;
+            }
+            50% {
+                right: 300px;
+                top: 0;
+            }
+            75% {
+                right: 400px;
+                top: 200px;
+            }
+            100% {
+                right: 0;
+                top: 200px;
+            }
+        }
+
+        @keyframes run {
+            0%, 100% {
+                transform: translateY(0) scaleY(1);
+            }
+            50% {
+                transform: translateY(-10px) scaleY(0.95);
+            }
+        }
+
+        .subtitle {
+            position: absolute;
+            bottom: 60px;
+            font-size: 1.3em;
+            color: #ff3333;
+            text-shadow: 
+                0 0 10px rgba(255, 51, 51, 0.8),
+                0 0 20px rgba(204, 0, 0, 0.6),
+                0 0 30px rgba(255, 0, 0, 0.4);
+            font-style: italic;
+            animation: pulse-text 2s ease-in-out infinite;
+            font-weight: bold;
+        }
+
+        @keyframes pulse-text {
+            0%, 100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="danger-sign danger-top-left">⚠️</div>
+        <div class="danger-sign danger-top-right">⚠️</div>
+        <div class="danger-sign danger-bottom-left">⚠️</div>
+        <div class="danger-sign danger-bottom-right">⚠️</div>
+        
+        <div class="caption">YOU ARE UNDER THE CONTROL OF SAM</div>
+        
+        <div class="monkeys-container">
+            <div class="monkey">
+                <span class="monkey-emoji">🐵</span>
+            </div>
+            <div class="monkey">
+                <span class="monkey-emoji">🐒</span>
+            </div>
+        </div>
+
+        <div class="subtitle">The monkeys virus just visited ... 🦠</div>
+    </div>
+</body>
+</html>
